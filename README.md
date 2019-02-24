@@ -64,6 +64,19 @@ $ time ./main input_large.csv output_isg_large.csv 1,2,0 1
   24.58s user 11.41s system 98% cpu 36.361 total
 ```
 
+## Tunability
+
+There are a few parameters in this sort which could be tuned to a dataset/machine to increase performance.
+
+- Chunk size, default 100,000, is the number of lines read at a time before splitting into temporary files.
+    This is almost 100% dependent on amount of ram a machine has. The bigger the chunk size, the more
+    time is spent in the parallized quicksort as opposed to the io-heavy merge step.
+- Thread count, parameter, is hte number of threads used in the quicksort thread pool.
+    This should just be the number of cpu cores your machine has (or double if hyperthreading), any more
+    and there are no gains from threadpooling.
+- Sequential quicksort threshold, default 100, is the size of the subarray after which quicksort switches from parallel to sequential.
+    The optimal number here can be experimentally determined but a default of 100 seems to work just fine.
+
 ## Correctness
 
 I compared results from my parallel quicksort implementation to the built-in `sort` via the built-in `diff`. That is,
