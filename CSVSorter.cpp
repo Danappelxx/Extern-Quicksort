@@ -19,13 +19,19 @@ CSVSorter::CSVSorter(const std::string& inputFileName, const std::string& output
 }
 
 void CSVSorter::sort() {
-    std::shared_ptr<CSVReader> inputReader = std::make_shared<CSVReader>(inputFileName);
+    // algorithm is as follows:
+    //  - process input file chunk by chunk
+    //  - for each chunk, sort the chunk and write it to a temporary file
+    //  - finally, perform a line-by-line merge on the temp files into the output file
+
+    CSVReader inputReader(inputFileName);
     std::vector<std::shared_ptr<TempFile>> tempFiles;
 
     while (true) {
         // read a chunk of lines
-        std::vector<std::shared_ptr<CSVLine>> lines = inputReader->readLines(chunkSize);
+        std::vector<std::shared_ptr<CSVLine>> lines = inputReader.readLines(chunkSize);
         if (lines.empty())
+            // reached eof
             break;
 
         // sort the chunk
@@ -36,13 +42,12 @@ void CSVSorter::sort() {
         // stream will automatically be closed once csv writer goes out of scope
         CSVWriter(tempFile->getFileName()).writeLines(lines);
 
-        // store the tempfiles so we can merge them back later
         tempFiles.push_back(tempFile);
     }
 
-    std::shared_ptr<CSVWriter> outputWriter = std::make_shared<CSVWriter>(outputFileName);
+    CSVWriter outputWriter(outputFileName);
 
-    // have the last line from each temp file read
+    // store readers and the latest line from each reader
     std::vector<std::shared_ptr<CSVReader>> readers;
     std::vector<std::shared_ptr<CSVLine>> lastLines;
     for (auto tempFile: tempFiles) {
@@ -53,8 +58,8 @@ void CSVSorter::sort() {
 
     // merge the chunks into the output file, line by line
     while (true) {
+        // if all lines are nullptr, then we have completed the merge
         if (std::count(lastLines.begin(), lastLines.end(), nullptr) == lastLines.size())
-            // all lines are nullptr, meaning no lines are left to be added
             break;
 
         // get the smallest line
@@ -62,9 +67,9 @@ void CSVSorter::sort() {
         auto minLineIndex = std::distance(lastLines.cbegin(), minLineIt);
 
         // write the smallest line
-        outputWriter->writeLine(*minLineIt);
+        outputWriter.writeLine(*minLineIt);
 
-        // consume the next line from the reader
+        // consume the next line from the reader, nullptr if eof
         lastLines[minLineIndex] = readers[minLineIndex]->readLine();
     }
 }
@@ -75,13 +80,11 @@ bool CSVSorter::compareLines(std::shared_ptr<CSVLine> a, std::shared_ptr<CSVLine
         return false;
     if (!b)
         return true;
-    // comparator function for lines
-    const auto& aValues = a->getValues();
-    const auto& bValues = b->getValues();
+    // comparison follows specified column order
     for (const int& col: sortColumns) {
-        if (*aValues[col] < *bValues[col]) {
+        if (*a->getValues()[col] < *b->getValues()[col]) {
             return true;
-        } else if (*aValues[col] > *bValues[col]) {
+        } else if (*a->getValues()[col] > *b->getValues()[col]) {
             return false;
         }
         // if not < or >, then equal, move on to next column
