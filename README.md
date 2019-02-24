@@ -2,12 +2,12 @@
 
 ## Compiling
 
-Tested on Apple LLVM Clang version 10. Should be compatible with recent version of GCC as well. Requires C++11.
+Tested on Apple LLVM Clang version 10, GCC versions 5, 6, 7, 8. Requires C++11. Portable to unix systems (tested macOS, Ubuntu). Dockerfile used for testing is included.
 
 ```
-$ clang++ -std=c++11 -O -o main *.cpp
+$ clang++ -std=c++11 -O -o main *.cpp -pthread
 # alternatively
-$ g++ -std=c++11 -O -o main *.cpp
+$ g++ -std=c++11 -O -o main *.cpp -pthread
 
 $ ./main input.csv output.csv 1,2 16
 ```
@@ -18,11 +18,11 @@ I used a fork of a popular single-header ThreadPool library, available [here](ht
 
 I was not able to find a small/flexible enough CSV library, so I ran with a short implementation of my own. Files "CSVReader", "CSVWriter", "CSVLine", "CSVValue" (.h,cpp).
 
-I made a wrapper class around the primitive/unsafe utilities for creating temporary files, "TempFile.h".
+I made a wrapper class around the primitive/unsafe utilities for creating temporary files, "TempFile.h,cpp".
 
 The implementation of Quicksort uses templates and as such is a single header file "Quicksort.h".
 
-The main sorting logic (breaking input into chunks, merging them back together) is in "CSVSorter.h".
+The main sorting logic (breaking input into chunks, merging them back together) is in "CSVSorter.h,cpp".
 
 ## Performance
 
@@ -70,8 +70,8 @@ There are a few parameters in this sort which could be tuned to a dataset/machin
 
 - Chunk size, default 100,000, is the number of lines read at a time before splitting into temporary files.
     This is almost 100% dependent on amount of ram a machine has. The bigger the chunk size, the more
-    time is spent in the parallized quicksort as opposed to the io-heavy merge step.
-- Thread count, parameter, is hte number of threads used in the quicksort thread pool.
+    time is spent in the parallelized quicksort as opposed to the io-heavy merge step.
+- Thread count, parameter, is the number of threads used in the quicksort thread pool.
     This should just be the number of cpu cores your machine has (or double if hyperthreading), any more
     and there are no gains from threadpooling.
 - Sequential quicksort threshold, default 100, is the size of the subarray after which quicksort switches from parallel to sequential.
@@ -93,8 +93,9 @@ In all tested cases the results were identical (so the sort seems to be correct)
 In attempt to improve runtime, I used a sampling profiler to analyze performance bottlenecks. My findings were as follows:
 
 - Only ~30% of runtime is spent actually sorting the data.
-    Sorting work is evenly distributed amonst cores (threads).
+    Sorting work is evenly distributed amongst cores (threads).
     This sorting is relatively efficient, with most of the cpu cycles going towards the partition method (not allocations, etc).
+    I did my best to optimize hot spots (specifically, the comparator).
 - Much of the time (~35%) goes to file system operations.
     That is, reading/writing the input, output, and temporary files.
     Unfortunately this is not particularly trivial to optimize, and seems out of the scope for this assignment.
