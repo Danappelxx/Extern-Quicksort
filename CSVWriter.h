@@ -12,6 +12,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <memory>
 
 class CSVWriter {
 public:

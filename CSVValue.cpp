@@ -7,6 +7,7 @@
 //
 
 #include "CSVValue.h"
+#include <cassert>
 
 CSVValue::CSVValue(const std::string& value) {
     stringValue = value;

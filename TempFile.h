@@ -10,6 +10,7 @@
 
 #include <unistd.h>
 #include <string>
+#include <string.h>
 
 class TempFile {
 public:

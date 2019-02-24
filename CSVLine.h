@@ -11,6 +11,7 @@
 #include "CSVValue.h"
 #include <string>
 #include <vector>
+#include <memory>
 
 class CSVLine {
 public:

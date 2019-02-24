@@ -10,6 +10,7 @@
 
 #include "ThreadPool.h"
 #include <vector>
+#include <memory>
 
 template <class T>
 class Quicksort {
