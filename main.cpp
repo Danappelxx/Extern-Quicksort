@@ -31,7 +31,7 @@ int main(int argc, const char* argv[]) {
     std::vector<int> sortColumns = parseColumnIndices(argv[3]);
     int threadCount = std::stoi(argv[4]);
 
-    int chunkSize = 1000000;
+    int chunkSize = 100000;
 
     CSVSorter sorter(inputFileName, outputFileName, sortColumns, threadCount, chunkSize);
     sorter.sort();
