@@ -2,7 +2,7 @@
 
 ## Compiling
 
-Tested on Apple LLVM Clang version 10, GCC versions 5, 6, 7, 8. Requires C++11. Portable to unix systems (tested macOS, Ubuntu). Dockerfile used for testing is included.
+Tested on Apple LLVM Clang version 10, GCC versions 5, 6, 7, 8. Requires C++11. Portable to unix systems (tested macOS, Ubuntu).
 
 ```
 $ clang++ -std=c++11 -O -o main *.cpp -pthread
@@ -24,9 +24,24 @@ The implementation of Quicksort uses templates and as such is a single header fi
 
 The main sorting logic (breaking input into chunks, merging them back together) is in "CSVSorter.h,cpp".
 
+Dockerfile used for testing is included as "Dockerfile".
+
+## Correctness
+
+I compared results from my parallel quicksort implementation to the built-in `sort` via the built-in `diff`. That is,
+
+```
+$ diff output_isg.csv output_sort.csv
+$ diff output_isg_large.csv output_sort_large.csv
+```
+
+In all tested cases the results were identical (so the sort seems to be correct).
+
+I also tested sorting files under tight memory constraints. I used Docker to run a container with only 50mb of RAM, it successfully sorted a 100mb csv file. The built-in `sort` utility error-ed as it ran out of memory.
+
 ## Performance
 
-This implementation performs worse than the standard `sort` utility available on most unix machines. This is pretty expected, as `sort` is very well optimized. Still, I consider this performance satisfactory, and it does improve when allowed more threads (up to a certain point).
+This implementation performs worse than the standard `sort` utility available on most unix machines. This is pretty expected, as `sort` is very well optimized and sorts the whole file in memory at once. I consider this implementation's performance satisfactory, and it improves when scaled to more cores.
 
 For the sample data fetched from Mars DB
 ```
@@ -76,17 +91,6 @@ There are a few parameters in this sort which could be tuned to a dataset/machin
     and there are no gains from threadpooling.
 - Sequential quicksort threshold, default 100, is the size of the subarray after which quicksort switches from parallel to sequential.
     The optimal number here can be experimentally determined but a default of 100 seems to work just fine.
-
-## Correctness
-
-I compared results from my parallel quicksort implementation to the built-in `sort` via the built-in `diff`. That is,
-
-```
-$ diff output_isg.csv output_sort.csv
-$ diff output_isg_large.csv output_sort_large.csv
-```
-
-In all tested cases the results were identical (so the sort seems to be correct).
 
 ## Profiling Notes
 
