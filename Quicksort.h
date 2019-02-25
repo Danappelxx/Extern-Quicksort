@@ -26,27 +26,27 @@ public:
 
 private:
     Quicksort(IT begin, IT end, int threadCount, std::function<bool(T, T)> lessThanComparator)
-    : begin(begin), end(end), lessThanComparator(lessThanComparator) {
-        threadPool = std::make_shared<progschj::ThreadPool>(threadCount);
+    : begin_(begin), end_(end), lessThanComparator_(lessThanComparator) {
+        threadPool_ = std::make_shared<progschj::ThreadPool>(threadCount);
     }
 
     void sort() {
         // kick-off parallel-recursive sort
-        parallelQuicksort(begin, end - 1);
+        parallelQuicksort(begin_, end_ - 1);
         // wait until all jobs are done
-        threadPool->wait_until_nothing_in_flight();
+        threadPool_->wait_until_nothing_in_flight();
     }
 
-    IT begin;
-    IT end;
-    std::shared_ptr<progschj::ThreadPool> threadPool;
-    std::function<bool(T, T)> lessThanComparator;
+    IT begin_;
+    IT end_;
+    std::shared_ptr<progschj::ThreadPool> threadPool_;
+    std::function<bool(T, T)> lessThanComparator_;
 
     IT partition(IT low, IT high) {
         T pivot = *high;
         IT i = low;
         for (IT j = low; j < high; j++) {
-            if (lessThanComparator(*j, pivot)) {
+            if (lessThanComparator_(*j, pivot)) {
                 std::iter_swap(i, j);
                 i++;
             }
@@ -59,8 +59,8 @@ private:
         if (low < high) {
             IT pivot = partition(low, high);
             if (std::distance(low, high) > 100) {
-                threadPool->enqueue([=]() { return parallelQuicksort(low, pivot - 1); });
-                threadPool->enqueue([=]() { return parallelQuicksort(pivot + 1, high); });
+                threadPool_->enqueue([=]() { return parallelQuicksort(low, pivot - 1); });
+                threadPool_->enqueue([=]() { return parallelQuicksort(pivot + 1, high); });
             } else {
                 // fallback to sequential sort once we get close
                 sequentialQuicksort(low, pivot - 1);

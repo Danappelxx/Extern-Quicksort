@@ -15,7 +15,7 @@
 #include <algorithm>
 
 CSVSorter::CSVSorter(const std::string& inputFileName, const std::string& outputFileName, const std::vector<int>& sortColumns, int threadCount, int chunkSize)
-    : inputFileName(inputFileName), outputFileName(outputFileName), sortColumns(sortColumns), threadCount(threadCount), chunkSize(chunkSize) {
+    : inputFileName_(inputFileName), outputFileName_(outputFileName), sortColumns_(sortColumns), threadCount_(threadCount), chunkSize_(chunkSize) {
 }
 
 void CSVSorter::sort() {
@@ -24,12 +24,12 @@ void CSVSorter::sort() {
     //  - for each chunk, sort the chunk and write it to a temporary file
     //  - finally, perform a line-by-line merge on the temp files into the output file
 
-    CSVReader inputReader(inputFileName);
+    CSVReader inputReader(inputFileName_);
     std::vector<std::shared_ptr<TempFile>> tempFiles;
 
     while (true) {
         // read a chunk of lines
-        std::vector<std::shared_ptr<CSVLine>> lines = inputReader.readLines(chunkSize);
+        std::vector<std::shared_ptr<CSVLine>> lines = inputReader.readLines(chunkSize_);
         if (lines.empty())
             // reached eof
             break;
@@ -45,7 +45,7 @@ void CSVSorter::sort() {
         tempFiles.push_back(tempFile);
     }
 
-    CSVWriter outputWriter(outputFileName);
+    CSVWriter outputWriter(outputFileName_);
 
     // store readers and the latest line from each reader
     std::vector<std::shared_ptr<CSVReader>> readers;
@@ -81,7 +81,7 @@ bool CSVSorter::compareLines(std::shared_ptr<CSVLine> a, std::shared_ptr<CSVLine
     if (!b)
         return true;
     // comparison follows specified column order
-    for (const int& col: sortColumns) {
+    for (const int& col: sortColumns_) {
         if (*a->getValues()[col] < *b->getValues()[col]) {
             return true;
         } else if (*a->getValues()[col] > *b->getValues()[col]) {
@@ -94,7 +94,7 @@ bool CSVSorter::compareLines(std::shared_ptr<CSVLine> a, std::shared_ptr<CSVLine
 
 void CSVSorter::sortLines(std::vector<std::shared_ptr<CSVLine>>& lines) {
     auto comparator = std::bind(&CSVSorter::compareLines, this, std::placeholders::_1, std::placeholders::_2);
-    Quicksort<std::shared_ptr<CSVLine>>::sort(lines.begin(), lines.end(), threadCount, comparator);
+    Quicksort<std::shared_ptr<CSVLine>>::sort(lines.begin(), lines.end(), threadCount_, comparator);
 }
 
 std::vector<std::shared_ptr<CSVLine>>::const_iterator CSVSorter::minLine(const std::vector<std::shared_ptr<CSVLine>>& lines) {

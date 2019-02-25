@@ -9,17 +9,17 @@
 #include "CSVWriter.h"
 
 CSVWriter::CSVWriter(const std::string& fileName) {
-    stream = std::ofstream(fileName);
+    stream_ = std::ofstream(fileName);
 }
 
 void CSVWriter::writeLine(std::shared_ptr<CSVLine> line) {
     auto values = line->getValues();
 
-    stream << **values.begin();
+    stream_ << **values.begin();
     for (auto it = values.begin() + 1; it != values.end(); it++) {
-        stream << "," << **it;
+        stream_ << "," << **it;
     }
-    stream << std::endl;
+    stream_ << std::endl;
 }
 
 void CSVWriter::writeLines(const std::vector<std::shared_ptr<CSVLine>>& lines) {

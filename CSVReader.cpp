@@ -9,12 +9,12 @@
 #include "CSVReader.h"
 
 CSVReader::CSVReader(const std::string& fileName) {
-    stream = std::ifstream(fileName);
+    stream_ = std::ifstream(fileName);
 }
 
 std::shared_ptr<CSVLine> CSVReader::readLine() {
     std::string line;
-    if (std::getline(stream, line)) {
+    if (std::getline(stream_, line)) {
         return std::make_shared<CSVLine>(line);
     }
     return nullptr;

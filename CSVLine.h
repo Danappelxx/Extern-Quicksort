@@ -17,8 +17,8 @@ class CSVLine {
 public:
     CSVLine(const std::string& line);
     inline const std::vector<std::shared_ptr<CSVValue>>& getValues() const {
-        return values;
+        return values_;
     }
 private:
-    std::vector<std::shared_ptr<CSVValue>> values;
+    std::vector<std::shared_ptr<CSVValue>> values_;
 };

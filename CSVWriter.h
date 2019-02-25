@@ -20,5 +20,5 @@ public:
     void writeLine(std::shared_ptr<CSVLine> line);
     void writeLines(const std::vector<std::shared_ptr<CSVLine>>& lines);
 private:
-    std::ofstream stream;
+    std::ofstream stream_;
 };

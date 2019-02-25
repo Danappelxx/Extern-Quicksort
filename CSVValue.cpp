@@ -10,15 +10,15 @@
 #include <cassert>
 
 CSVValue::CSVValue(const std::string& value) {
-    stringValue = value;
-    valueType = CSVValueType::STRING;
+    stringValue_ = value;
+    valueType_ = CSVValueType::STRING;
 
     // attempt to convert to long, if fails then consider it a string value
     char* temp;
     std::strtol(value.c_str(), &temp, 0);
     if (*temp == '\0') {
-        longValue = std::stol(value);
-        valueType = CSVValueType::LONG;
+        longValue_ = std::stol(value);
+        valueType_ = CSVValueType::LONG;
     }
 }
 

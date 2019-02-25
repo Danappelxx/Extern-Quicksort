@@ -22,5 +22,5 @@ public:
     // returns a vector of lines UP TO count
     std::vector<std::shared_ptr<CSVLine>> readLines(int count);
 private:
-    std::ifstream stream;
+    std::ifstream stream_;
 };

@@ -20,11 +20,11 @@ public:
     // reads input file, breaks it into sorted chunks, merges those chunks into output file
     void sort();
 private:
-    std::string inputFileName;
-    std::string outputFileName;
-    std::vector<int> sortColumns;
-    int threadCount;
-    int chunkSize;
+    std::string inputFileName_;
+    std::string outputFileName_;
+    std::vector<int> sortColumns_;
+    int threadCount_;
+    int chunkSize_;
 
     // sorts vector of lines in place
     void sortLines(std::vector<std::shared_ptr<CSVLine>>& lines);

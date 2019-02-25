@@ -10,11 +10,11 @@
 #include <sstream>
 
 CSVLine::CSVLine(const std::string& line) {
-    values = std::vector<std::shared_ptr<CSVValue>>();
+    values_ = std::vector<std::shared_ptr<CSVValue>>();
 
     std::istringstream ss(line);
     std::string current;
     while(std::getline(ss, current, ',')) {
-        values.push_back(std::make_shared<CSVValue>(current));
+        values_.push_back(std::make_shared<CSVValue>(current));
     }
 }

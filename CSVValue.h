@@ -20,18 +20,18 @@ class CSVValue {
 public:
     CSVValue(const std::string& value);
     inline const CSVValueType& getType() const {
-        return valueType;
+        return valueType_;
     }
     inline const long& getLong() const {
-        return longValue;
+        return longValue_;
     }
     inline const std::string& getString() const {
-        return stringValue;
+        return stringValue_;
     };
 private:
-    CSVValueType valueType;
-    std::string stringValue;
-    long longValue;
+    CSVValueType valueType_;
+    std::string stringValue_;
+    long longValue_;
 };
 
 std::ostream& operator<<(std::ostream& os, CSVValue& value);
