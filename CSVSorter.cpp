@@ -50,7 +50,7 @@ void CSVSorter::sort() {
     // store readers and the latest line from each reader
     std::vector<std::shared_ptr<CSVReader>> readers;
     std::vector<std::shared_ptr<CSVLine>> lastLines;
-    for (auto tempFile: tempFiles) {
+    for (const auto& tempFile: tempFiles) {
         std::shared_ptr<CSVReader> reader = std::make_shared<CSVReader>(tempFile->getFileName());
         readers.push_back(reader);
         lastLines.push_back(reader->readLine());

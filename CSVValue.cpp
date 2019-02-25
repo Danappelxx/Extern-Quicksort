@@ -7,7 +7,6 @@
 //
 
 #include "CSVValue.h"
-#include <cassert>
 
 CSVValue::CSVValue(const std::string& value) {
     stringValue_ = value;
@@ -28,7 +27,12 @@ std::ostream& operator <<(std::ostream& os, CSVValue& value) {
 }
 
 bool operator <(CSVValue const& a, CSVValue const& b) {
-    assert(a.getType() == b.getType());
+    if (a.getType() != b.getType()) {
+        // this is really an error in the data - it means that different values in
+        // the same column have different types. not much we can do about it though
+        // fall back to string comparison as that is the most likely intention
+        return a.getString() < b.getString();
+    }
     switch (a.getType()) {
         case CSVValueType::STRING: return a.getString() < b.getString();
         case CSVValueType::LONG: return a.getLong() < b.getLong();
@@ -36,7 +40,12 @@ bool operator <(CSVValue const& a, CSVValue const& b) {
 }
 
 bool operator >(CSVValue const& a, CSVValue const& b) {
-    assert(a.getType() == b.getType());
+    if (a.getType() != b.getType()) {
+        // this is really an error in the data - it means that different values in
+        // the same column have different types. not much we can do about it though
+        // fall back to string comparison as that is the most likely intention
+        return a.getString() > b.getString();
+    }
     switch (a.getType()) {
         case CSVValueType::STRING: return a.getString() > b.getString();
         case CSVValueType::LONG: return a.getLong() > b.getLong();
