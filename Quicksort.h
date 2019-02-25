@@ -42,7 +42,7 @@ private:
     std::shared_ptr<progschj::ThreadPool> threadPool_;
     std::function<bool(T, T)> lessThanComparator_;
 
-    IT partition(IT low, IT high) {
+    IT partition(const IT& low, const IT& high) {
         T pivot = *high;
         IT i = low;
         for (IT j = low; j < high; j++) {
@@ -55,7 +55,7 @@ private:
         return i;
     }
 
-    void parallelQuicksort(IT low, IT high) {
+    void parallelQuicksort(const IT& low, const IT& high) {
         if (low < high) {
             IT pivot = partition(low, high);
             if (std::distance(low, high) > 100) {
@@ -69,7 +69,7 @@ private:
         }
     }
 
-    void sequentialQuicksort(IT low, IT high) {
+    void sequentialQuicksort(const IT& low, const IT& high) {
         if (low < high) {
             IT pivot = partition(low, high);
             sequentialQuicksort(low, pivot - 1);
